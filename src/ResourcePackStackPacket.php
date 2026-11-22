@@ -38,7 +38,7 @@ class ResourcePackStackPacket extends DataPacket implements ClientboundPacket{
 	public ?int $editorPackTypes = null;
 
 	/**
-	 * @generate-create-func
+	 * Preserves the original six-argument create() API; extra Preview flags are optional.
 	 * @param ResourcePackStackEntry[] $resourcePackStack
 	 * @param ResourcePackStackEntry[] $behaviorPackStack
 	 */

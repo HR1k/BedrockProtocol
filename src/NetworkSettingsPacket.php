@@ -20,6 +20,7 @@ use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\CompressionAlgorithm;
+use pocketmine\network\mcpe\protocol\types\SctpRecoveryProfile;
 
 /**
  * This is the first packet sent by the server in a game session, in response to a network settings request (only if
@@ -37,9 +38,10 @@ class NetworkSettingsPacket extends DataPacket implements ClientboundPacket{
 	private bool $enableClientThrottling;
 	private int $clientThrottleThreshold;
 	private float $clientThrottleScalar;
+	private SctpRecoveryProfile $sctpRecoveryProfile = SctpRecoveryProfile::DEFAULT;
 
 	/**
-	 * @generate-create-func
+	 * Preserves the original five-argument create() API.
 	 */
 	public static function create(int $compressionThreshold, CompressionAlgorithm $compressionAlgorithm, bool $enableClientThrottling, int $clientThrottleThreshold, float $clientThrottleScalar) : self{
 		$result = new self;
@@ -67,12 +69,21 @@ class NetworkSettingsPacket extends DataPacket implements ClientboundPacket{
 
 	public function getClientThrottleScalar() : float{ return $this->clientThrottleScalar; }
 
+	public function getSctpRecoveryProfile() : SctpRecoveryProfile{ return $this->sctpRecoveryProfile; }
+
+	public function setSctpRecoveryProfile(SctpRecoveryProfile $profile) : void{ $this->sctpRecoveryProfile = $profile; }
+
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->compressionThreshold = LE::readUnsignedShort($in);
 		$this->compressionAlgorithm = CompressionAlgorithm::fromPacket(LE::readUnsignedShort($in));
 		$this->enableClientThrottling = CommonTypes::getBool($in);
 		$this->clientThrottleThreshold = Byte::readUnsigned($in);
 		$this->clientThrottleScalar = LE::readFloat($in);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26){
+			$this->sctpRecoveryProfile = SctpRecoveryProfile::fromPacket(Byte::readUnsigned($in));
+		}else{
+			$this->sctpRecoveryProfile = SctpRecoveryProfile::DEFAULT;
+		}
 	}
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
@@ -81,6 +92,9 @@ class NetworkSettingsPacket extends DataPacket implements ClientboundPacket{
 		CommonTypes::putBool($out, $this->enableClientThrottling);
 		Byte::writeUnsigned($out, $this->clientThrottleThreshold);
 		LE::writeFloat($out, $this->clientThrottleScalar);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26){
+			Byte::writeUnsigned($out, $this->sctpRecoveryProfile->value);
+		}
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{
