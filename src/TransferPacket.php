@@ -19,6 +19,7 @@ use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\GatheringJoinInfo;
+use pocketmine\network\mcpe\protocol\types\TransferPlayerUIOptions;
 
 class TransferPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::TRANSFER_PACKET;
@@ -28,9 +29,11 @@ class TransferPacket extends DataPacket implements ClientboundPacket{
 	public bool $reloadWorld = false;
 	/** >= ProtocolInfo::PROTOCOL_1_26_40 */
 	public ?GatheringJoinInfo $gatheringsConfig = null;
+	/** Optional destination loading-screen options since Preview .23. */
+	private ?TransferPlayerUIOptions $transferUIOptions = null;
 
 	/**
-	 * @generate-create-func
+	 * Keep NG's original four-parameter create() signature.
 	 */
 	public static function create(string $address, int $port, bool $reloadWorld, ?GatheringJoinInfo $gatheringsConfig) : self{
 		$result = new self;
@@ -41,6 +44,10 @@ class TransferPacket extends DataPacket implements ClientboundPacket{
 		return $result;
 	}
 
+	public function getTransferUIOptions() : ?TransferPlayerUIOptions{ return $this->transferUIOptions; }
+
+	public function setTransferUIOptions(?TransferPlayerUIOptions $options) : void{ $this->transferUIOptions = $options; }
+
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->address = CommonTypes::getString($in);
 		$this->port = LE::readUnsignedShort($in);
@@ -49,6 +56,9 @@ class TransferPacket extends DataPacket implements ClientboundPacket{
 		}
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_40){
 			$this->gatheringsConfig = CommonTypes::readOptional($in, fn(ByteBufferReader $in) => GatheringJoinInfo::read($in, $protocolId));
+		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_23){
+			$this->transferUIOptions = CommonTypes::readOptional($in, TransferPlayerUIOptions::read(...));
 		}
 	}
 
@@ -60,6 +70,9 @@ class TransferPacket extends DataPacket implements ClientboundPacket{
 		}
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_40){
 			CommonTypes::writeOptional($out, $this->gatheringsConfig, fn(ByteBufferWriter $out, GatheringJoinInfo $info) => $info->write($out, $protocolId));
+		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_23){
+			CommonTypes::writeOptional($out, $this->transferUIOptions, static fn(ByteBufferWriter $out, TransferPlayerUIOptions $options) => $options->write($out));
 		}
 	}
 
