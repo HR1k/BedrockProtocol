@@ -111,8 +111,8 @@ final class PassengerAndSoundPreviewTest extends TestCase{
 		self::assertNull($decoded->getAttachedEntityRuntimeId());
 	}
 
-	public function testPreview2259StillDisabled() : void{
+	public function testPreview2259Accepted() : void{
 		self::assertSame(2225, ProtocolInfo::CURRENT_PROTOCOL);
-		self::assertNotContains(2259, ProtocolInfo::ACCEPTED_PROTOCOL);
+		self::assertContains(2259, ProtocolInfo::ACCEPTED_PROTOCOL);
 	}
 }

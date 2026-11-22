@@ -67,8 +67,8 @@ final class VirtualContainerPacketTest extends TestCase{
 		self::encode(VirtualContainerOpenPacket::create(1, 1, str_repeat("x", 257), [new ItemStackWrapper(0, ItemStack::null())]), ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26);
 	}
 
-	public function testPreviewProtocolNotAdvertised() : void{
+	public function testPreviewProtocolAcceptedForTesting() : void{
 		self::assertSame(2225, ProtocolInfo::CURRENT_PROTOCOL);
-		self::assertNotContains(2259, ProtocolInfo::ACCEPTED_PROTOCOL);
+		self::assertContains(2259, ProtocolInfo::ACCEPTED_PROTOCOL);
 	}
 }

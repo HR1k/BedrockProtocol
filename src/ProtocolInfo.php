@@ -66,6 +66,8 @@ final class ProtocolInfo{
 		self::PROTOCOL_1_26_45,
 		self::PROTOCOL_1_26_50,
 		self::CURRENT_PROTOCOL,
+		// Direct-server preview testing only; the default server network version remains 26.60.
+		self::PROTOCOL_1_26_70_PREVIEW_26,
 	];
 
 	/** Display version shown in the server logs. This should match the version on the game's home screen. */

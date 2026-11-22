@@ -51,6 +51,6 @@ final class ServerJoinInfoPreviewTest extends TestCase{
 
 	public function testExistingProtocolAvailabilityIsUnchanged() : void{
 		self::assertSame(ProtocolInfo::PROTOCOL_1_26_60, ProtocolInfo::CURRENT_PROTOCOL);
-		self::assertNotContains(ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26, ProtocolInfo::ACCEPTED_PROTOCOL);
+		self::assertContains(ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26, ProtocolInfo::ACCEPTED_PROTOCOL);
 	}
 }

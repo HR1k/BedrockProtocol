@@ -74,8 +74,8 @@ final class PreviewCommandCompatibilityTest extends TestCase{
 		self::assertNull($message->rawMessage);
 	}
 
-	public function testCurrentProtocolRemainsLegacyForNow() : void{
+	public function testDefaultProtocolRemainsLegacyWithPreviewAvailable() : void{
 		self::assertSame(2225, ProtocolInfo::CURRENT_PROTOCOL);
-		self::assertNotContains(2259, ProtocolInfo::ACCEPTED_PROTOCOL);
+		self::assertContains(2259, ProtocolInfo::ACCEPTED_PROTOCOL);
 	}
 }
