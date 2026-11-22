@@ -91,4 +91,6 @@ final class ContainerUIIds{
 	public const RESERVED_CONTAINER_B = 68;
 	public const RESERVED_CONTAINER_C = 69;
 	public const RESERVED_CONTAINER_D = 70;
+	/** Minecraft Preview 26.70: inventory slot container identifier. */
+	public const VIRTUAL_CONTAINER = 71;
 }

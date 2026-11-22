@@ -62,4 +62,6 @@ final class WindowTypes{
 	public const CRAFTER = 36;
 
 	public const RESERVED_CONTAINER_TYPE = 38;
+	/** Minecraft Preview 26.70: container with no backing block or entity. */
+	public const VIRTUAL_CONTAINER = 39;
 }
