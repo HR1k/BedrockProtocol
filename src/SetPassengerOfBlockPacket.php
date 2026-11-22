@@ -47,12 +47,12 @@ final class SetPassengerOfBlockPacket extends DataPacket implements ClientboundP
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
 		CommonTypes::putActorUniqueId($out, $this->actorUniqueId);
-		CommonTypes::writeOptional($out, $this->passengerData, static fn(ByteBufferWriter $out, PassengerOfBlockData $data) => $data->write($out));
+		CommonTypes::writeOptional($out, $this->passengerData, static fn(ByteBufferWriter $out, PassengerOfBlockData $data) => $data->write($out, $protocolId));
 	}
 
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->actorUniqueId = CommonTypes::getActorUniqueId($in);
-		$this->passengerData = CommonTypes::readOptional($in, PassengerOfBlockData::read(...));
+		$this->passengerData = CommonTypes::readOptional($in, fn(ByteBufferReader $in) => PassengerOfBlockData::read($in, $protocolId));
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

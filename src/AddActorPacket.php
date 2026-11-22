@@ -123,7 +123,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
 
 		$this->links = CommonTypes::readList($in, fn(ByteBufferReader $in) : EntityLink => CommonTypes::getEntityLink($in, $protocolId));
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_60){
-			$this->passengerBlockData = CommonTypes::readOptional($in, PassengerOfBlockData::read(...));
+			$this->passengerBlockData = CommonTypes::readOptional($in, fn(ByteBufferReader $in) => PassengerOfBlockData::read($in, $protocolId));
 		}
 	}
 
@@ -150,7 +150,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
 
 		CommonTypes::writeList($out, $this->links, fn(ByteBufferWriter $out, EntityLink $link) => CommonTypes::putEntityLink($out, $protocolId, $link));
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_60){
-			CommonTypes::writeOptional($out, $this->passengerBlockData, static fn(ByteBufferWriter $out, PassengerOfBlockData $data) => $data->write($out));
+			CommonTypes::writeOptional($out, $this->passengerBlockData, static fn(ByteBufferWriter $out, PassengerOfBlockData $data) => $data->write($out, $protocolId));
 		}
 	}
 

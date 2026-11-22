@@ -19,7 +19,10 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Spec name: PassengerOfBlockArguments
@@ -31,7 +34,9 @@ final class PassengerOfBlockData{
 		private readonly Vector3 $offset,
 		private readonly float $rotation,
 		private readonly float $rotationLimit,
-		private readonly EmoteType $emoteType
+		private readonly EmoteType $emoteType,
+		private readonly int $blockType = 0,
+		private readonly ?UuidInterface $packUuid = null
 	){
 	}
 
@@ -55,21 +60,35 @@ final class PassengerOfBlockData{
 		return $this->emoteType;
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	/** The block hashed serialized ID added in Preview .23. */
+	public function getBlockType() : int{ return $this->blockType; }
+
+	/** The behavior pack UUID added in Preview .24, null when not supplied by an older caller. */
+	public function getPackUuid() : ?UuidInterface{ return $this->packUuid; }
+
+	public function write(ByteBufferWriter $out, int $protocolId = ProtocolInfo::PROTOCOL_1_26_60) : void{
 		CommonTypes::putBlockPosition($out, $this->blockPos);
 		CommonTypes::putVector3($out, $this->offset);
 		LE::writeFloat($out, $this->rotation);
 		LE::writeFloat($out, $this->rotationLimit);
 		Byte::writeUnsigned($out, $this->emoteType->value);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_23){
+			LE::writeUnsignedLong($out, $this->blockType);
+		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26){
+			CommonTypes::putUUID($out, $this->packUuid ?? Uuid::fromString(Uuid::NIL));
+		}
 	}
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId = ProtocolInfo::PROTOCOL_1_26_60) : self{
 		$blockPos = CommonTypes::getBlockPosition($in);
 		$offset = CommonTypes::getVector3($in);
 		$rotation = LE::readFloat($in);
 		$rotationLimit = LE::readFloat($in);
 		$emoteType = EmoteType::fromPacket(Byte::readUnsigned($in));
+		$blockType = $protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_23 ? LE::readUnsignedLong($in) : 0;
+		$packUuid = $protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26 ? CommonTypes::getUUID($in) : null;
 
-		return new self($blockPos, $offset, $rotation, $rotationLimit, $emoteType);
+		return new self($blockPos, $offset, $rotation, $rotationLimit, $emoteType, $blockType, $packUuid);
 	}
 }

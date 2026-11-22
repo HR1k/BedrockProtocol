@@ -37,9 +37,13 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 	public ?int $serverSoundHandle = null;
 	/** >= ProtocolInfo::PROTOCOL_1_26_50 */
 	public ?float $playbackPositionSeconds = null;
+	/** >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_23 */
+	private ?float $startDelaySeconds = null;
+	/** >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26 */
+	private ?int $attachedEntityRuntimeId = null;
 
 	/**
-	 * @generate-create-func
+	 * Keep the NG ten-argument create() API. Preview fields are configured through setters.
 	 */
 	public static function create(
 		string $soundName,
@@ -67,6 +71,14 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		return $result;
 	}
 
+	public function getStartDelaySeconds() : ?float{ return $this->startDelaySeconds; }
+
+	public function setStartDelaySeconds(?float $seconds) : void{ $this->startDelaySeconds = $seconds; }
+
+	public function getAttachedEntityRuntimeId() : ?int{ return $this->attachedEntityRuntimeId; }
+
+	public function setAttachedEntityRuntimeId(?int $actorRuntimeId) : void{ $this->attachedEntityRuntimeId = $actorRuntimeId; }
+
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->soundName = CommonTypes::getString($in);
 		$blockPosition = CommonTypes::getBlockPosition($in, $protocolId >= ProtocolInfo::PROTOCOL_1_26_10);
@@ -87,6 +99,12 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_50){
 			$this->playbackPositionSeconds = CommonTypes::readOptional($in, LE::readFloat(...));
 		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_23){
+			$this->startDelaySeconds = CommonTypes::readOptional($in, LE::readFloat(...));
+		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26){
+			$this->attachedEntityRuntimeId = CommonTypes::readOptional($in, CommonTypes::getActorRuntimeId(...));
+		}
 	}
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
@@ -105,6 +123,12 @@ class PlaySoundPacket extends DataPacket implements ClientboundPacket{
 		}
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_50){
 			CommonTypes::writeOptional($out, $this->playbackPositionSeconds, LE::writeFloat(...));
+		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_23){
+			CommonTypes::writeOptional($out, $this->startDelaySeconds, LE::writeFloat(...));
+		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26){
+			CommonTypes::writeOptional($out, $this->attachedEntityRuntimeId, CommonTypes::putActorRuntimeId(...));
 		}
 	}
 

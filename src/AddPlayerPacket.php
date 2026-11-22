@@ -131,7 +131,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
 		}
 
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_60){
-			$this->passengerBlockData = CommonTypes::readOptional($in, PassengerOfBlockData::read(...));
+			$this->passengerBlockData = CommonTypes::readOptional($in, fn(ByteBufferReader $in) => PassengerOfBlockData::read($in, $protocolId));
 		}
 		$this->deviceId = CommonTypes::getString($in);
 		$this->buildPlatform = LE::readSignedInt($in);
@@ -160,7 +160,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
 		}
 
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_60){
-			CommonTypes::writeOptional($out, $this->passengerBlockData, static fn(ByteBufferWriter $out, PassengerOfBlockData $data) => $data->write($out));
+			CommonTypes::writeOptional($out, $this->passengerBlockData, static fn(ByteBufferWriter $out, PassengerOfBlockData $data) => $data->write($out, $protocolId));
 		}
 		CommonTypes::putString($out, $this->deviceId);
 		LE::writeSignedInt($out, $this->buildPlatform);
