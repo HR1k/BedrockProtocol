@@ -1009,4 +1009,12 @@ trait PacketHandlerDefaultImplTrait{
 	public function handleServerboundRegisterAudioContent(ServerboundRegisterAudioContentPacket $packet) : bool{
 		return false;
 	}
+
+	public function handleVirtualContainerOpen(VirtualContainerOpenPacket $packet) : bool{
+		return false;
+	}
+
+	public function handleVirtualContainerClose(VirtualContainerClosePacket $packet) : bool{
+		return false;
+	}
 }

@@ -511,4 +511,8 @@ interface PacketHandlerInterface{
 	public function handleClientboundPlayAudioContent(ClientboundPlayAudioContentPacket $packet) : bool;
 
 	public function handleServerboundRegisterAudioContent(ServerboundRegisterAudioContentPacket $packet) : bool;
+
+	public function handleVirtualContainerOpen(VirtualContainerOpenPacket $packet) : bool;
+
+	public function handleVirtualContainerClose(VirtualContainerClosePacket $packet) : bool;
 }
