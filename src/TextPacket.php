@@ -68,6 +68,8 @@ class TextPacket extends DataPacket implements ClientboundPacket, ServerboundPac
 	public string $message;
 	/** @var string[] */
 	public array $parameters = [];
+	/** Preview 1.26.70+: queue translated messages and jukebox popups behind existing notifications. */
+	public bool $queue = false;
 	public string $xboxUserId = "";
 	public string $platformChatId = "";
 	public ?string $filteredMessage = null;
@@ -182,6 +184,9 @@ class TextPacket extends DataPacket implements ClientboundPacket, ServerboundPac
 				for($i = 0; $i < $count; ++$i){
 					$this->parameters[] = CommonTypes::getString($in);
 				}
+				if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_23){
+					$this->queue = CommonTypes::getBool($in);
+				}
 				break;
 		}
 
@@ -250,6 +255,9 @@ class TextPacket extends DataPacket implements ClientboundPacket, ServerboundPac
 				VarInt::writeUnsignedInt($out, count($this->parameters));
 				foreach($this->parameters as $p){
 					CommonTypes::putString($out, $p);
+				}
+				if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_23){
+					CommonTypes::putBool($out, $this->queue);
 				}
 				break;
 		}
