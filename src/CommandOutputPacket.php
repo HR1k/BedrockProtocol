@@ -95,6 +95,9 @@ class CommandOutputPacket extends DataPacket implements ClientboundPacket{
 			$message->parameters[] = CommonTypes::getString($in);
 		}
 
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_20){
+			$message->rawMessage = CommonTypes::readOptional($in, CommonTypes::getString(...));
+		}
 		return $message;
 	}
 
@@ -132,6 +135,9 @@ class CommandOutputPacket extends DataPacket implements ClientboundPacket{
 		VarInt::writeUnsignedInt($out, count($message->parameters));
 		foreach($message->parameters as $parameter){
 			CommonTypes::putString($out, $parameter);
+		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_20){
+			CommonTypes::writeOptional($out, $message->rawMessage, CommonTypes::putString(...));
 		}
 	}
 

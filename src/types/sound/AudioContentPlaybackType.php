@@ -21,4 +21,6 @@ enum AudioContentPlaybackType : int{
 
 	case MUSIC = 0;
 	case SOUND = 1;
+	/** Added in Preview .21 (same wire enum; no old packet changes). */
+	case CONCURRENT_MUSIC = 2;
 }

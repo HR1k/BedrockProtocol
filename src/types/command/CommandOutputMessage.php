@@ -20,5 +20,7 @@ class CommandOutputMessage{
 	public string $messageId;
 	/** @var string[] */
 	public array $parameters = [];
+	/** Optional JSON rawtext payload since Preview 26.70.20. */
+	public ?string $rawMessage = null;
 
 }

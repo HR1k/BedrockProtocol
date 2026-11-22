@@ -25,4 +25,6 @@ enum InputMode : int{
 	 * @deprecated 1.21.120
 	 */
 	case MOTION_CONTROLLER = 4;
+	/** Added in 1.26.70 Preview .21. */
+	case GAME_PAD_AND_MOUSE = 5;
 }

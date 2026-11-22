@@ -40,6 +40,8 @@ class CommandBlockUpdatePacket extends DataPacket implements ServerboundPacket{
 	public bool $shouldTrackOutput;
 	public int $tickDelay;
 	public bool $executeOnFirstTick;
+	/** Since 1.26.70 Preview .20; absent from legacy wire. */
+	public bool $lastOutputIsRawMessage = false;
 
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->isBlock = CommonTypes::getBool($in);
@@ -63,6 +65,9 @@ class CommandBlockUpdatePacket extends DataPacket implements ServerboundPacket{
 		$this->shouldTrackOutput = CommonTypes::getBool($in);
 		$this->tickDelay = LE::readUnsignedInt($in);
 		$this->executeOnFirstTick = CommonTypes::getBool($in);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_20){
+			$this->lastOutputIsRawMessage = CommonTypes::getBool($in);
+		}
 	}
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
@@ -86,6 +91,9 @@ class CommandBlockUpdatePacket extends DataPacket implements ServerboundPacket{
 		CommonTypes::putBool($out, $this->shouldTrackOutput);
 		LE::writeUnsignedInt($out, $this->tickDelay);
 		CommonTypes::putBool($out, $this->executeOnFirstTick);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_20){
+			CommonTypes::putBool($out, $this->lastOutputIsRawMessage);
+		}
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

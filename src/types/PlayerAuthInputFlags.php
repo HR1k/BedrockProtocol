@@ -118,6 +118,8 @@ final class PlayerAuthInputFlags{
 	public const SNEAK_RELEASED_RAW = 62;
 	public const SNEAK_PRESSED_RAW = 63;
 	public const SNEAK_CURRENT_RAW = 64;
+	/** Preview .20 renamed bit 65; keep the old identifier as an API alias. */
+	public const SWAP_OFFHAND = 65;
 	public const INTERNAL_UPDATE = 65;
 
 	public const NUMBER_OF_FLAGS = 66;
