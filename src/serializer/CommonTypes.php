@@ -522,6 +522,10 @@ final class CommonTypes{
 		}
 
 		$blockRuntimeId = VarInt::readUnsignedInt($in);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26){
+			// 2259 uses signed FNV-1a 32-bit block hashes internally, while this wire field is varuint32.
+			$blockRuntimeId = Binary::signInt($blockRuntimeId);
+		}
 		$rawExtraData = self::getString($in);
 
 		return new ItemStackWrapper($stackId, new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData), $variant);
@@ -540,7 +544,8 @@ final class CommonTypes{
 			VarInt::writeSignedInt($out, $itemStackWrapper->getStackId());
 		}
 
-		VarInt::writeUnsignedInt($out, $itemStackWrapper->getItemStack()->getBlockRuntimeId());
+		$blockRuntimeId = $itemStackWrapper->getItemStack()->getBlockRuntimeId();
+		VarInt::writeUnsignedInt($out, $protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_26 ? Binary::unsignInt($blockRuntimeId) : $blockRuntimeId);
 		self::putString($out, $itemStackWrapper->getItemStack()->getRawExtraData());
 	}
 
