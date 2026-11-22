@@ -73,6 +73,9 @@ final class ProtocolInfo{
 	/** Version sent on the network for client side compatibility checks. This may differ from the display version. */
 	public const MINECRAFT_VERSION_NETWORK = '1.26.60';
 
+	/** Preview protocol numbers for wire format gates; clients are NOT accepted until all changes are implemented. */
+	public const PROTOCOL_1_26_70_PREVIEW_26 = 2259;
+	public const PROTOCOL_1_26_70_PREVIEW_22 = 2239;
 	public const PROTOCOL_1_26_60 = 2225;
 	public const PROTOCOL_1_26_50 = 2193;
 	public const PROTOCOL_1_26_45 = 2169;

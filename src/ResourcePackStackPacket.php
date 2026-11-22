@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol;
 
+use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
@@ -33,6 +34,8 @@ class ResourcePackStackPacket extends DataPacket implements ClientboundPacket{
 	public string $baseGameVersion = ProtocolInfo::MINECRAFT_VERSION_NETWORK;
 	public Experiments $experiments;
 	public bool $useVanillaEditorPacks;
+	/** 1.26.70 Preview editor pack flags: bit 0 = core, bit 1 = annotation. Null preserves old bool API. */
+	public ?int $editorPackTypes = null;
 
 	/**
 	 * @generate-create-func
@@ -66,7 +69,13 @@ class ResourcePackStackPacket extends DataPacket implements ClientboundPacket{
 
 		$this->baseGameVersion = CommonTypes::getString($in);
 		$this->experiments = Experiments::read($in);
-		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_80){
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_22){
+			$this->editorPackTypes = Byte::readUnsigned($in);
+			if($this->editorPackTypes > 0x3){
+				throw new PacketDecodeException("Invalid editor pack types bitmask: " . $this->editorPackTypes);
+			}
+			$this->useVanillaEditorPacks = ($this->editorPackTypes & 0x1) !== 0;
+		}elseif($protocolId >= ProtocolInfo::PROTOCOL_1_20_80){
 			$this->useVanillaEditorPacks = CommonTypes::getBool($in);
 		}
 	}
@@ -87,7 +96,13 @@ class ResourcePackStackPacket extends DataPacket implements ClientboundPacket{
 
 		CommonTypes::putString($out, $this->baseGameVersion);
 		$this->experiments->write($out);
-		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_80){
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_22){
+			$editorPackTypes = $this->editorPackTypes ?? ($this->useVanillaEditorPacks ? 0x1 : 0x0);
+			if($editorPackTypes < 0 || $editorPackTypes > 0x3){
+				throw new \InvalidArgumentException("Invalid editor pack types bitmask: $editorPackTypes");
+			}
+			Byte::writeUnsigned($out, $editorPackTypes);
+		}elseif($protocolId >= ProtocolInfo::PROTOCOL_1_20_80){
 			CommonTypes::putBool($out, $this->useVanillaEditorPacks);
 		}
 	}
