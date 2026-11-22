@@ -77,6 +77,7 @@ final class ProtocolInfo{
 	public const PROTOCOL_1_26_70_PREVIEW_26 = 2259;
 	public const PROTOCOL_1_26_70_PREVIEW_23 = 2250;
 	public const PROTOCOL_1_26_70_PREVIEW_22 = 2239;
+	public const PROTOCOL_1_26_70_PREVIEW_20 = 2235;
 	public const PROTOCOL_1_26_60 = 2225;
 	public const PROTOCOL_1_26_50 = 2193;
 	public const PROTOCOL_1_26_45 = 2169;

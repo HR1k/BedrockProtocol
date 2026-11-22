@@ -25,6 +25,7 @@ final class ServerJoinInformation{
 		private ?GatheringJoinInfo $gatheringJoinInfo,
 		private ?StoreEntryPointInfo $storeEntryPointInfo,
 		private ?PresenceInfo $presenceInfo,
+		private ?bool $managedChatEnabled = null,
 	){}
 
 	public function getGatheringJoinInfo() : ?GatheringJoinInfo{ return $this->gatheringJoinInfo; }
@@ -32,6 +33,9 @@ final class ServerJoinInformation{
 	public function getStoreEntryPointInfo() : ?StoreEntryPointInfo{ return $this->storeEntryPointInfo; }
 
 	public function getPresenceInfo() : ?PresenceInfo{ return $this->presenceInfo; }
+
+	/** Null disables the optional Mojang Managed Chat join configuration. */
+	public function getManagedChatEnabled() : ?bool{ return $this->managedChatEnabled; }
 
 	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		$storeEntryPointInfo = null;
@@ -50,11 +54,15 @@ final class ServerJoinInformation{
 			$storeEntryPointInfo = CommonTypes::readOptional($in, StoreEntryPointInfo::read(...));
 			$presenceInfo = CommonTypes::readOptional($in, fn(ByteBufferReader $in) => PresenceInfo::read($in, $protocolId));
 		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_20){
+			$managedChatEnabled = CommonTypes::readOptional($in, CommonTypes::getBool(...));
+		}
 
 		return new self(
 			$gatheringJoinInfo,
 			$storeEntryPointInfo,
 			$presenceInfo ?? null,
+			$managedChatEnabled ?? null,
 		);
 	}
 
@@ -69,6 +77,9 @@ final class ServerJoinInformation{
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_10){
 			CommonTypes::writeOptional($out, $this->storeEntryPointInfo, fn(ByteBufferWriter $out, StoreEntryPointInfo $info) => $info->write($out));
 			CommonTypes::writeOptional($out, $this->presenceInfo, fn(ByteBufferWriter $out, PresenceInfo $info) => $info->write($out, $protocolId));
+		}
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_26_70_PREVIEW_20){
+			CommonTypes::writeOptional($out, $this->managedChatEnabled, CommonTypes::putBool(...));
 		}
 	}
 }
