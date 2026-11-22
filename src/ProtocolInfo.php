@@ -371,6 +371,7 @@ final class ProtocolInfo{
 	public const SERVERBOUND_REGISTER_AUDIO_CONTENT_PACKET = 0x168;
 
 	/** Added in Minecraft Preview 26.70 (protocol 2259). */
+	public const CHAT_PACKET = 0x169;
 	public const VIRTUAL_CONTAINER_OPEN_PACKET = 0x16e;
 	public const VIRTUAL_CONTAINER_CLOSE_PACKET = 0x16f;
 

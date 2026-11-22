@@ -282,6 +282,7 @@ class PacketPool{
 		$this->registerPacket(new ServerboundCursorItemDragPacket());
 		$this->registerPacket(new ClientboundPlayAudioContentPacket());
 		$this->registerPacket(new ServerboundRegisterAudioContentPacket());
+		$this->registerPacket(new ChatPacket());
 		$this->registerPacket(new VirtualContainerOpenPacket());
 		$this->registerPacket(new VirtualContainerClosePacket());
 	}

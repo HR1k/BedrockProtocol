@@ -1010,6 +1010,10 @@ trait PacketHandlerDefaultImplTrait{
 		return false;
 	}
 
+	public function handleChat(ChatPacket $packet) : bool{
+		return false;
+	}
+
 	public function handleVirtualContainerOpen(VirtualContainerOpenPacket $packet) : bool{
 		return false;
 	}
